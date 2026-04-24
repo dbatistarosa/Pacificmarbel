@@ -114,10 +114,10 @@ const gs = {
   fontFamily: "'Outfit', sans-serif",
 };
 
-function Img({ src, alt, style = {}, ...props }) {
+function Img({ src, alt, style = {}, priority = false, ...props }) {
   const [err, setErr] = useState(false);
   if (err) return <div style={{ background: C.mc, display: "flex", alignItems: "center", justifyContent: "center", color: C.txtl, fontSize: 12, ...style }}>{alt}</div>;
-  return <img src={src} alt={alt} onError={() => setErr(true)} style={{ display: "block", ...style }} {...props} />;
+  return <img src={src} alt={alt} loading={priority ? "eager" : "lazy"} decoding={priority ? "sync" : "async"} onError={() => setErr(true)} style={{ display: "block", ...style }} {...props} />;
 }
 
 function Eyebrow({ children, light }) {
@@ -207,14 +207,23 @@ function CtaBand({ title, sub }) {
 }
 
 function PageHero({ bg, breadcrumb, eyebrow, title, sub }) {
+  const crumbSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pacificmarbel.vercel.app/" },
+      { "@type": "ListItem", "position": 2, "name": breadcrumb }
+    ]
+  });
   return (
     <div style={{ position: "relative", background: C.char, padding: "5rem 1.5rem 4rem", overflow: "hidden" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: crumbSchema }} />
       <div style={{ position: "absolute", inset: 0, backgroundImage: `url(${bg})`, backgroundSize: "cover", backgroundPosition: "center", opacity: .3 }} />
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(105deg,rgba(26,26,26,.9),rgba(26,26,26,.5))" }} />
       <div style={{ position: "relative", zIndex: 2, maxWidth: 760, margin: "0 auto" }}>
-        <div style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,.4)", marginBottom: 14, display: "flex", gap: 6 }}>
+        <nav aria-label="Breadcrumb" style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,.4)", marginBottom: 14, display: "flex", gap: 6 }}>
           <span>Home</span><span style={{ color: C.gold }}>/ {breadcrumb}</span>
-        </div>
+        </nav>
         <Eyebrow light>{eyebrow}</Eyebrow>
         <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2rem,4vw,3.5rem)", fontWeight: 300, color: C.white, lineHeight: 1.15, marginBottom: 14 }}>{title}</h1>
         <p style={{ color: "rgba(255,255,255,.6)", fontSize: 15, lineHeight: 1.8, maxWidth: 560 }}>{sub}</p>
@@ -232,7 +241,7 @@ function PageHome({ nav }) {
       <div style={{ position: "relative", minHeight: "92vh", display: "flex", alignItems: "center", background: C.char, overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: `url(${IMGS.heroBg})`, backgroundSize: "cover", backgroundPosition: "center", opacity: .32 }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(110deg,rgba(26,26,26,.92) 0%,rgba(26,26,26,.6) 55%,rgba(26,26,26,.25) 100%)" }} />
-        <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto", padding: "0 1.5rem", width: "100%", display: "grid", gridTemplateColumns: "1fr 370px", gap: "4rem", alignItems: "center" }}>
+        <div className="grid-hero" style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto", padding: "0 1.5rem", display: "grid", gridTemplateColumns: "1fr 370px", gap: "4rem", alignItems: "center" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: C.gl, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "1.5rem" }}>
               <div style={{ width: 30, height: 1, background: C.gold }} />
@@ -258,7 +267,7 @@ function PageHome({ nav }) {
             </div>
           </div>
           {/* Credentials card */}
-          <div style={{ background: "rgba(240,236,228,.06)", border: "1px solid rgba(184,150,110,.2)", borderRadius: 12, padding: "2rem", backdropFilter: "blur(8px)" }}>
+          <div className="hero-cred-hide" style={{ background: "rgba(240,236,228,.06)", border: "1px solid rgba(184,150,110,.2)", borderRadius: 12, padding: "2rem", backdropFilter: "blur(8px)" }}>
             <div style={{ fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", color: C.gold, marginBottom: "1rem" }}>Licensed & Accredited</div>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.25rem", color: C.white, marginBottom: 8 }}>Pacific Marble Restoration Corp.</div>
             {[["Palm Beach County", "#07031"], ["Broward County", "#325-239123"], ["Dade County", "#675906-3"], ["BBB Accredited", "Since 2014"], ["Angie's List", "A+ Rated"]].map(([k, v]) => (
@@ -280,12 +289,12 @@ function PageHome({ nav }) {
       {/* Services */}
       <div style={{ background: C.white }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "5rem 1.5rem 2rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "end", marginBottom: "3rem" }}>
+          <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "end", marginBottom: "3rem" }}>
             <div><Eyebrow>What We Do</Eyebrow><H2>Expert Stone & <em style={{ fontStyle: "italic", color: C.gd }}>Marble Services</em></H2></div>
             <p style={{ color: C.txtl, lineHeight: 1.82, fontSize: 15 }}>Every surface is unique. Every project receives the same elite level of craftsmanship — whether it's a kitchen countertop or a 100-foot yacht.</p>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5px", background: C.bdr }}>
+        <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5px", background: C.bdr }}>
           {[
             { n: "01", h: "Marble Restoration & Polishing", p: "Remove scratches, dull spots, stains, and etches to restore your marble's natural brilliance using advanced diamond tooling and eco-friendly products.", page: "marble-polishing" },
             { n: "02", h: "Porcelain Cleaning", p: "Transform your porcelain surfaces back to their original luster with our specialized deep-cleaning process for floors, walls, and countertops.", page: "porcelain" },
@@ -306,7 +315,7 @@ function PageHome({ nav }) {
 
       {/* About strip */}
       <div style={{ background: C.char, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
           <div style={{ position: "relative" }}>
             <Img src={IMGS.van} alt="Pacific Marble company van Boca Raton FL" style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", borderRadius: 4 }} />
             <div style={{ position: "absolute", bottom: -24, right: -24, background: C.gold, color: C.white, borderRadius: 8, padding: "1.4rem", textAlign: "center", boxShadow: "0 8px 20px rgba(0,0,0,.3)" }}>
@@ -332,7 +341,7 @@ function PageHome({ nav }) {
             <div><Eyebrow light>See Our Work</Eyebrow><H2 light>Watch Pacific Marble <em style={{ fontStyle: "italic", color: C.gl }}>in Action</em></H2></div>
             <p style={{ color: "rgba(255,255,255,.5)", fontSize: 14, maxWidth: 360, lineHeight: 1.7 }}>From house preparation to the final reveal — watch our team at work on marble floors, countertops, and more.</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem" }}>
+          <div className="grid-video" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem" }}>
             <div style={{ borderRadius: 8, overflow: "hidden", background: "#000", aspectRatio: "16/9" }}>
               <video controls preload="none" poster={IMGS.marbleClean} style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }}>
                 <source src={VIDEO_URL} type="video/mp4" />
@@ -362,7 +371,7 @@ function PageHome({ nav }) {
               </div>
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem" }}>
+          <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem" }}>
             {REVIEWS.map(r => <ReviewCard key={r.name} r={r} />)}
           </div>
         </div>
@@ -373,7 +382,7 @@ function PageHome({ nav }) {
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <Eyebrow>Service Area</Eyebrow>
           <H2>Serving All of <em style={{ fontStyle: "italic", color: C.gd }}>South Florida</em></H2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem", marginTop: "2.5rem" }}>
+          <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem", marginTop: "2.5rem" }}>
             {[
               { county: "Palm Beach County", cities: "Boca Raton · Delray Beach · Boynton Beach · West Palm Beach · Palm Beach Gardens · Wellington · Lake Worth · Jupiter · Royal Palm Beach · Greenacres" },
               { county: "Broward County", cities: "Fort Lauderdale · Hollywood · Pembroke Pines · Coral Springs · Miramar · Pompano Beach · Davie · Sunrise · Plantation · Weston · Deerfield Beach · Coconut Creek" },
@@ -401,7 +410,7 @@ function PageAbout({ nav }) {
     <div>
       <PageHero bg={IMGS.aboutHero} breadcrumb="About Us" eyebrow="Pacific Marble Restoration" title="About Us" sub="We specialize in bringing back the natural beauty of your marble surfaces through expert polishing, restoration, and cleaning services." />
       <div style={{ background: C.white, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
           <div>
             <Img src={IMGS.van2} alt="Pacific Marble Restoration van" style={{ width: "100%", borderRadius: 6, aspectRatio: "4/3", objectFit: "cover" }} />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginTop: "1rem" }}>
@@ -426,7 +435,7 @@ function PageAbout({ nav }) {
             <Eyebrow>Why Choose Us</Eyebrow>
             <H2>Our <em style={{ fontStyle: "italic", color: C.gd }}>Commitment</em></H2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem" }}>
+          <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem" }}>
             {[
               { icon: "🏆", h: "Experienced Professionals", p: "Highly trained team committed to delivering results that exceed your expectations in every project." },
               { icon: "⚡", h: "State-of-the-Art Techniques", p: "Latest techniques and equipment ensuring your marble is treated with the care it deserves." },
@@ -454,7 +463,7 @@ function PageMarblePolishing({ nav }) {
     <div>
       <PageHero bg={IMGS.marblePolish} breadcrumb="Services / Marble Polishing" eyebrow="Palm Beach · Broward · Dade Counties" title="Marble Restoration & Polishing" sub="Our expert marble polishing restores the natural shine and luster of marble surfaces by removing dull spots, scratches, and etches." />
       <div style={{ background: C.white, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
           <div>
             <Eyebrow>Why Choose Us</Eyebrow>
             <H2>Expert Marble Care for <em style={{ fontStyle: "italic", color: C.gd }}>South Florida</em></H2>
@@ -469,7 +478,7 @@ function PageMarblePolishing({ nav }) {
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <Eyebrow>Our Process</Eyebrow>
           <H2>A Meticulous 6-Step <em style={{ fontStyle: "italic", color: C.gd }}>Process</em></H2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem", marginTop: "2.5rem" }}>
+          <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem", marginTop: "2.5rem" }}>
             {[
               { n: "01", h: "Initial Assessment", p: "Thoroughly inspect marble surfaces to identify stains, scratches, and dullness, noting the type of marble and its specific characteristics." },
               { n: "02", h: "Deep Cleaning", p: "pH-neutral cleaning solutions safe for marble and effective at lifting grime without causing damage." },
@@ -489,7 +498,7 @@ function PageMarblePolishing({ nav }) {
       </div>
       <div style={{ background: C.white, padding: "6rem 1.5rem" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem" }}>
+          <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem" }}>
             <Img src={IMGS.cleanService} alt="Luxury living room after marble restoration" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 6 }} />
             <Img src={IMGS.marbleFloor} alt="Marble floor after polishing" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 6 }} />
             <Img src={IMGS.polishedFloor} alt="Polished marble floor South Florida" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 6 }} />
@@ -506,7 +515,7 @@ function PagePorcelain() {
     <div>
       <PageHero bg={IMGS.porcelain} breadcrumb="Services / Porcelain Cleaning" eyebrow="Palm Beach · Broward · Dade Counties" title="Porcelain Cleaning" sub="Transform the look of your porcelain surfaces with our professional cleaning services using non-abrasive techniques to restore original beauty and luster." />
       <div style={{ background: C.white, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
           <div>
             <Eyebrow>Why Professional Cleaning</Eyebrow>
             <H2>Restore Porcelain to Its <em style={{ fontStyle: "italic", color: C.gd }}>Original Beauty</em></H2>
@@ -521,7 +530,7 @@ function PagePorcelain() {
         </div>
       </div>
       <div style={{ background: C.mw, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
           <div>
             <Eyebrow>Our System</Eyebrow>
             <H2>The Pacific Porcelain <em style={{ fontStyle: "italic", color: C.gd }}>Cleaning System</em></H2>
@@ -543,7 +552,7 @@ function PageYacht() {
     <div>
       <PageHero bg={IMGS.yachtPolish} breadcrumb="Services / Yacht Services" eyebrow="A+ Rated · Since 2003" title="Yacht Services" sub="Pacific Marble Restoration has been performing comprehensive marble polishing for yachts since 2003. We have restored many yachts of different builds and sizes — rated A+ on Angie's List and the Better Business Bureau." />
       <div style={{ background: C.white, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
           <div>
             <Eyebrow>The Marine Challenge</Eyebrow>
             <H2>Why Yacht Marble Requires <em style={{ fontStyle: "italic", color: C.gd }}>Professional Care</em></H2>
@@ -569,7 +578,7 @@ function PageYacht() {
         </div>
       </div>
       <div style={{ background: C.mw, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
           <Img src={IMGS.polishYacht} alt="Marble polishing on yacht" style={{ width: "100%", borderRadius: 6, aspectRatio: "4/3", objectFit: "cover" }} />
           <div>
             <Eyebrow>Our Expertise</Eyebrow>
@@ -583,7 +592,7 @@ function PageYacht() {
       </div>
       <div style={{ background: C.white, padding: "4rem 1.5rem" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+          <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
             <Img src={IMGS.yachtPolish2} alt="Marble polishing for yachts" style={{ width: "100%", borderRadius: 6, aspectRatio: "16/10", objectFit: "cover" }} />
             <Img src={IMGS.yachtBoats} alt="Marble polishing for boats Boca Raton" style={{ width: "100%", borderRadius: 6, aspectRatio: "16/10", objectFit: "cover" }} />
           </div>
@@ -600,7 +609,7 @@ function PageGrout() {
     <div>
       <PageHero bg={IMGS.groutClean} breadcrumb="Services / Grout Services" eyebrow="Palm Beach · Broward · Dade Counties" title="Grout Services" sub="Enhance the appearance and longevity of your tiled surfaces with our comprehensive grout services. Over time, grout lines become discolored, stained, and damaged." />
       <div style={{ background: C.white, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
           <div>
             <Eyebrow>Expert Grout Care</Eyebrow>
             <H2>Pristine Tile Surfaces <em style={{ fontStyle: "italic", color: C.gd }}>Restored</em></H2>
@@ -618,7 +627,7 @@ function PageGrout() {
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <Eyebrow>Services Offered</Eyebrow>
           <H2>Our Grout <em style={{ fontStyle: "italic", color: C.gd }}>Service Options</em></H2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem", marginTop: "2.5rem" }}>
+          <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem", marginTop: "2.5rem" }}>
             {[
               { img: IMGS.grout1, h: "Tile & Grout Cleaning", p: "Deep cleaning and restoring the original color of your tiles and grout lines using specialized cleaning agents and high-pressure steam equipment." },
               { img: IMGS.groutSeal, h: "Porcelain Tile Clean & Seal", p: "Advanced cleaning to restore original beauty with a high-quality sealant that protects from future stains, spills, and wear for years." },
@@ -673,7 +682,7 @@ function PagePhotoGallery() {
       )}
 
       <div style={{ background: C.white, padding: "4rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "0.75rem" }}>
+        <div className="grid-4" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "0.75rem" }}>
           {GALLERY.map((img, i) => (
             <div key={i} onClick={() => setLb(i)} style={{ aspectRatio: "1", overflow: "hidden", borderRadius: 4, cursor: "pointer", position: "relative" }}>
               <Img src={img.thumb} alt={img.alt} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .4s", display: "block" }}
@@ -693,7 +702,7 @@ function PageVideoGallery() {
     <div>
       <PageHero bg={IMGS.videoThumb} breadcrumb="Gallery / Video Gallery" eyebrow="Watch Our Team at Work" title="Video Gallery" sub="From house preparation to the final reveal — watch our team restore marble floors, countertops, and yacht interiors across South Florida." />
       <div style={{ background: C.white, padding: "4rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
           {[
             {
               type: "video",
@@ -757,7 +766,7 @@ function PageBeforeAfter() {
     <div>
       <PageHero bg={IMGS.cleanService} breadcrumb="Gallery / Before & After" eyebrow="Transformations" title="Before / After Gallery" sub="See the stunning transformations we achieve — from dull, damaged marble and flooring to breathtaking, showroom-quality results." />
       <div style={{ background: C.white, padding: "4rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "2rem" }}>
+        <div className="grid-3" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "2rem" }}>
           {pairs.map((p, i) => (
             <div key={i} style={{ background: C.white, borderRadius: 10, overflow: "hidden", border: `1px solid ${C.bdr}` }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
@@ -788,7 +797,7 @@ function PageProcess() {
     <div>
       <PageHero bg={IMGS.polishing4} breadcrumb="Our Process" eyebrow="Pacific Marble Restoration" title="Our Process" sub="Our team of experts specializes in restoring marble surfaces to their original beauty. From removing stains and scratches to polishing and sealing, we offer a wide range of services." />
       <div style={{ background: C.white, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
           <div>
             <Eyebrow>How We Work</Eyebrow>
             <H2>The Pacific Marble <em style={{ fontStyle: "italic", color: C.gd }}>Restoration System</em></H2>
@@ -827,7 +836,7 @@ function PageProcess() {
       </div>
       <div style={{ background: C.mw, padding: "4rem 1.5rem" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+          <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
             <div>
               <div style={{ fontSize: 13, letterSpacing: "0.1em", textTransform: "uppercase", color: C.gd, marginBottom: "1rem", fontWeight: 600 }}>Marble Restoration System</div>
               <Img src={IMGS.processImg} alt="Pacific Marble restoration system" style={{ width: "100%", borderRadius: 6 }} />
@@ -840,7 +849,7 @@ function PageProcess() {
         </div>
       </div>
       <div style={{ background: C.char, padding: "4rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
           <Img src={IMGS.cambria} alt="Luxury yacht interior marble" style={{ width: "100%", borderRadius: 6, aspectRatio: "16/9", objectFit: "cover" }} />
           <Img src={IMGS.bathDark} alt="Marble bathroom floor and wall" style={{ width: "100%", borderRadius: 6, aspectRatio: "16/9", objectFit: "cover" }} />
         </div>
@@ -852,11 +861,21 @@ function PageProcess() {
 
 function PageFaq() {
   const [open, setOpen] = useState(null);
+  const faqSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQS.map(f => ({
+      "@type": "Question",
+      "name": f.q,
+      "acceptedAnswer": { "@type": "Answer", "text": f.a }
+    }))
+  });
   return (
     <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqSchema }} />
       <PageHero bg={IMGS.faq1} breadcrumb="FAQ" eyebrow="Pacific Marble Restoration" title="Frequently Asked Questions" sub="We've compiled answers to the questions we hear most about marble care, polishing, and restoration." />
       <div style={{ background: C.white, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
           <div>
             {FAQS.map((f, i) => (
               <div key={i} style={{ borderBottom: `1px solid ${C.bdr}`, padding: "1.4rem 0" }}>
@@ -884,7 +903,7 @@ function PageContact() {
     <div>
       <PageHero bg={IMGS.van} breadcrumb="Contact Us" eyebrow="Get In Touch" title="Contact Pacific Marble" sub="Call, email, or fill out the form below. Free no-obligation estimates — same-day response available." />
       <div style={{ background: C.char, padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem" }}>
+        <div className="grid-2" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem" }}>
           <div>
             <Eyebrow light>Reach Us</Eyebrow>
             <H2 light>Let's Talk About <em style={{ fontStyle: "italic", color: C.gl }}>Your Marble</em></H2>
@@ -922,7 +941,7 @@ function PageContact() {
 /* ── NAV & FOOTER ── */
 function Topbar() {
   return (
-    <div style={{ background: C.char, padding: "8px 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+    <div className="topbar-hide" style={{ background: C.char, padding: "8px 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
       <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
         {[["📞 1-855-680-7239", "tel:+18556807239"], ["📞 1-800-658-7198", "tel:+18006587198"], ["💬 WhatsApp: 561-955-0375", "https://wa.me/15619550375"], ["✉️ info@pmarble.com", "mailto:info@pmarble.com"]].map(([l, h]) => (
           <a key={h} href={h} style={{ color: "rgba(255,255,255,.65)", fontSize: 12, textDecoration: "none" }}>{l}</a>
@@ -941,58 +960,112 @@ function Nav({ current, nav }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [svcOpen, setSvcOpen] = useState(false);
   const [galOpen, setGalOpen] = useState(false);
+  const [mobileSvcOpen, setMobileSvcOpen] = useState(false);
+  const [mobileGalOpen, setMobileGalOpen] = useState(false);
 
-  const link = (lbl, page, active) => (
-    <span onClick={() => { nav(page); setMobileOpen(false); setSvcOpen(false); setGalOpen(false); }}
-      style={{ color: active ? C.gd : C.txt, fontSize: 13, fontWeight: 500, letterSpacing: "0.07em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 4, cursor: "pointer", background: active ? `rgba(184,150,110,.12)` : "transparent", display: "block" }}>
+  const goTo = (page) => { nav(page); setMobileOpen(false); setSvcOpen(false); setGalOpen(false); setMobileSvcOpen(false); setMobileGalOpen(false); };
+
+  const link = (lbl, page) => (
+    <span role="button" tabIndex={0} onClick={() => goTo(page)} onKeyDown={e => e.key === "Enter" && goTo(page)}
+      style={{ color: current === page ? C.gd : C.txt, fontSize: 13, fontWeight: 500, letterSpacing: "0.07em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 4, cursor: "pointer", background: current === page ? `rgba(184,150,110,.12)` : "transparent", display: "block" }}>
       {lbl}
     </span>
   );
 
+  const rowStyle = { display: "flex", alignItems: "center", justifyContent: "space-between", height: 70, padding: "0 1.5rem" };
+  const mobileItemStyle = { padding: "14px 1.5rem", fontSize: 14, color: C.txt, cursor: "pointer", borderBottom: `1px solid ${C.bdr}`, fontWeight: 500, letterSpacing: "0.04em", display: "flex", justifyContent: "space-between", alignItems: "center" };
+  const mobileSubStyle = { padding: "12px 2.5rem", fontSize: 13, color: C.stone, cursor: "pointer", borderBottom: `1px solid ${C.bdr}` };
+
   return (
-    <nav style={{ position: "sticky", top: 0, zIndex: 300, background: "rgba(240,236,228,.97)", backdropFilter: "blur(14px)", borderBottom: `1px solid ${C.bdr}`, padding: "0 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", height: 70 }}>
-      <img src={IMGS.logo} alt="Pacific Marble Restoration" onClick={() => nav("home")} style={{ height: 38, cursor: "pointer" }}
-        onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "block"; }}
-      />
-      <span onClick={() => nav("home")} style={{ display: "none", fontFamily: "'Cormorant Garamond', serif", fontSize: "1.2rem", color: C.char, cursor: "pointer", fontWeight: 600 }}>Pacific Marble</span>
+    <nav aria-label="Main navigation" style={{ position: "sticky", top: 0, zIndex: 300, background: "rgba(240,236,228,.97)", backdropFilter: "blur(14px)", borderBottom: `1px solid ${C.bdr}` }}>
+      <div style={rowStyle}>
+        <img src={IMGS.logo} alt="Pacific Marble Restoration logo" onClick={() => goTo("home")} style={{ height: 38, cursor: "pointer" }}
+          onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "block"; }}
+        />
+        <span role="button" tabIndex={0} onClick={() => goTo("home")} style={{ display: "none", fontFamily: "'Cormorant Garamond', serif", fontSize: "1.2rem", color: C.char, cursor: "pointer", fontWeight: 600 }}>Pacific Marble</span>
 
-      {/* Desktop nav */}
-      <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-        {link("Home", "home", current === "home")}
-        {link("About", "about", current === "about")}
-
-        {/* Services dropdown */}
-        <div style={{ position: "relative" }} onMouseEnter={() => setSvcOpen(true)} onMouseLeave={() => setSvcOpen(false)}>
-          <span style={{ color: C.txt, fontSize: 13, fontWeight: 500, letterSpacing: "0.07em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>Services ▾</span>
-          {svcOpen && (
-            <div style={{ position: "absolute", top: "100%", left: 0, background: C.white, border: `1px solid ${C.bdr}`, borderRadius: 8, minWidth: 230, padding: "0.5rem", boxShadow: "0 8px 28px rgba(0,0,0,.13)", zIndex: 400 }}>
-              {[["Marble Polishing / Restoration", "marble-polishing"], ["Porcelain Cleaning", "porcelain"], ["Yacht Services", "yacht"], ["Grout Services", "grout"]].map(([l, p]) => (
-                <span key={p} onClick={() => { nav(p); setSvcOpen(false); }} style={{ display: "block", padding: "9px 14px", fontSize: 13, color: C.txt, borderRadius: 4, cursor: "pointer" }}
-                  onMouseEnter={e => e.target.style.background = C.mc}
-                  onMouseLeave={e => e.target.style.background = "transparent"}>{l}</span>
-              ))}
-            </div>
-          )}
+        {/* Desktop nav */}
+        <div className="nav-desktop" style={{ alignItems: "center", gap: 2 }}>
+          {link("Home", "home")}
+          {link("About", "about")}
+          <div style={{ position: "relative" }} onMouseEnter={() => setSvcOpen(true)} onMouseLeave={() => setSvcOpen(false)}>
+            <span style={{ color: C.txt, fontSize: 13, fontWeight: 500, letterSpacing: "0.07em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>Services ▾</span>
+            {svcOpen && (
+              <div style={{ position: "absolute", top: "100%", left: 0, background: C.white, border: `1px solid ${C.bdr}`, borderRadius: 8, minWidth: 230, padding: "0.5rem", boxShadow: "0 8px 28px rgba(0,0,0,.13)", zIndex: 400 }}>
+                {[["Marble Polishing / Restoration", "marble-polishing"], ["Porcelain Cleaning", "porcelain"], ["Yacht Services", "yacht"], ["Grout Services", "grout"]].map(([l, p]) => (
+                  <span key={p} role="button" tabIndex={0} onClick={() => goTo(p)} style={{ display: "block", padding: "9px 14px", fontSize: 13, color: C.txt, borderRadius: 4, cursor: "pointer" }}
+                    onMouseEnter={e => e.currentTarget.style.background = C.mc}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>{l}</span>
+                ))}
+              </div>
+            )}
+          </div>
+          <div style={{ position: "relative" }} onMouseEnter={() => setGalOpen(true)} onMouseLeave={() => setGalOpen(false)}>
+            <span style={{ color: C.txt, fontSize: 13, fontWeight: 500, letterSpacing: "0.07em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>Gallery ▾</span>
+            {galOpen && (
+              <div style={{ position: "absolute", top: "100%", left: 0, background: C.white, border: `1px solid ${C.bdr}`, borderRadius: 8, minWidth: 200, padding: "0.5rem", boxShadow: "0 8px 28px rgba(0,0,0,.13)", zIndex: 400 }}>
+                {[["Photo Gallery", "photo-gallery"], ["Video Gallery", "video-gallery"], ["Before / After", "before-after"]].map(([l, p]) => (
+                  <span key={p} role="button" tabIndex={0} onClick={() => goTo(p)} style={{ display: "block", padding: "9px 14px", fontSize: 13, color: C.txt, borderRadius: 4, cursor: "pointer" }}
+                    onMouseEnter={e => e.currentTarget.style.background = C.mc}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>{l}</span>
+                ))}
+              </div>
+            )}
+          </div>
+          {link("Our Process", "our-process")}
+          {link("FAQ", "faq")}
+          <span role="button" tabIndex={0} onClick={() => goTo("contact")} style={{ background: C.gold, color: C.white, fontSize: 13, fontWeight: 600, letterSpacing: "0.05em", padding: "9px 18px", borderRadius: 4, cursor: "pointer", marginLeft: 4 }}>Free Quote</span>
         </div>
 
-        {/* Gallery dropdown */}
-        <div style={{ position: "relative" }} onMouseEnter={() => setGalOpen(true)} onMouseLeave={() => setGalOpen(false)}>
-          <span style={{ color: C.txt, fontSize: 13, fontWeight: 500, letterSpacing: "0.07em", textTransform: "uppercase", padding: "8px 12px", borderRadius: 4, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>Gallery ▾</span>
-          {galOpen && (
-            <div style={{ position: "absolute", top: "100%", left: 0, background: C.white, border: `1px solid ${C.bdr}`, borderRadius: 8, minWidth: 200, padding: "0.5rem", boxShadow: "0 8px 28px rgba(0,0,0,.13)", zIndex: 400 }}>
-              {[["Photo Gallery", "photo-gallery"], ["Video Gallery", "video-gallery"], ["Before / After", "before-after"]].map(([l, p]) => (
-                <span key={p} onClick={() => { nav(p); setGalOpen(false); }} style={{ display: "block", padding: "9px 14px", fontSize: 13, color: C.txt, borderRadius: 4, cursor: "pointer" }}
-                  onMouseEnter={e => e.target.style.background = C.mc}
-                  onMouseLeave={e => e.target.style.background = "transparent"}>{l}</span>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {link("Our Process", "our-process", current === "our-process")}
-        {link("FAQ", "faq", current === "faq")}
-        <span onClick={() => nav("contact")} style={{ background: C.gold, color: C.white, fontSize: 13, fontWeight: 600, letterSpacing: "0.05em", padding: "9px 18px", borderRadius: 4, cursor: "pointer", marginLeft: 4 }}>Free Quote</span>
+        {/* Hamburger — mobile only */}
+        <button className="nav-hamburger" onClick={() => setMobileOpen(o => !o)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen}
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex", flexDirection: "column", justifyContent: "center", gap: 5, alignItems: "center" }}>
+          {mobileOpen
+            ? <span style={{ fontSize: 22, color: C.char, lineHeight: 1 }}>✕</span>
+            : <>{[0,1,2].map(i => <span key={i} style={{ width: 24, height: 2, background: C.char, display: "block", borderRadius: 2 }} />)}</>}
+        </button>
       </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div style={{ background: C.mw, borderTop: `1px solid ${C.bdr}`, maxHeight: "calc(100vh - 70px)", overflowY: "auto" }}>
+          {[["Home", "home"], ["About", "about"]].map(([l, p]) => (
+            <div key={p} role="button" tabIndex={0} onClick={() => goTo(p)} style={mobileItemStyle}>{l}</div>
+          ))}
+          <div>
+            <div role="button" tabIndex={0} onClick={() => setMobileSvcOpen(o => !o)} style={mobileItemStyle}>
+              Services <span style={{ fontSize: 12, transition: "transform .2s", display: "inline-block", transform: mobileSvcOpen ? "rotate(180deg)" : "none" }}>▾</span>
+            </div>
+            {mobileSvcOpen && (
+              <div style={{ background: "rgba(0,0,0,.03)" }}>
+                {[["Marble Polishing / Restoration", "marble-polishing"], ["Porcelain Cleaning", "porcelain"], ["Yacht Services", "yacht"], ["Grout Services", "grout"]].map(([l, p]) => (
+                  <div key={p} role="button" tabIndex={0} onClick={() => goTo(p)} style={mobileSubStyle}>{l}</div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <div role="button" tabIndex={0} onClick={() => setMobileGalOpen(o => !o)} style={mobileItemStyle}>
+              Gallery <span style={{ fontSize: 12, transition: "transform .2s", display: "inline-block", transform: mobileGalOpen ? "rotate(180deg)" : "none" }}>▾</span>
+            </div>
+            {mobileGalOpen && (
+              <div style={{ background: "rgba(0,0,0,.03)" }}>
+                {[["Photo Gallery", "photo-gallery"], ["Video Gallery", "video-gallery"], ["Before / After", "before-after"]].map(([l, p]) => (
+                  <div key={p} role="button" tabIndex={0} onClick={() => goTo(p)} style={mobileSubStyle}>{l}</div>
+                ))}
+              </div>
+            )}
+          </div>
+          {[["Our Process", "our-process"], ["FAQ", "faq"]].map(([l, p]) => (
+            <div key={p} role="button" tabIndex={0} onClick={() => goTo(p)} style={mobileItemStyle}>{l}</div>
+          ))}
+          <div style={{ padding: "1rem 1.5rem 1.5rem" }}>
+            <div role="button" tabIndex={0} onClick={() => goTo("contact")} style={{ background: C.gold, color: C.white, padding: "14px", borderRadius: 4, textAlign: "center", fontSize: 14, fontWeight: 600, letterSpacing: "0.05em", cursor: "pointer" }}>
+              Free Quote
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
@@ -1000,7 +1073,7 @@ function Nav({ current, nav }) {
 function Footer({ nav }) {
   return (
     <footer style={{ background: C.char2, padding: "4rem 1.5rem 2rem", borderTop: "1px solid rgba(255,255,255,.05)" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "3rem", paddingBottom: "3rem", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+      <div className="grid-footer" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "3rem", paddingBottom: "3rem", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
         <div>
           <img src={IMGS.logo} alt="Pacific Marble Restoration" style={{ height: 34, filter: "brightness(0) invert(1)", opacity: .65 }} onError={e => e.target.style.display = "none"} />
           <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", lineHeight: 1.85, marginTop: "1rem", maxWidth: 280 }}>South Florida's most recommended marble restoration company since 2003. Family owned and operated.</p>
@@ -1089,7 +1162,9 @@ export default function App() {
       `}</style>
       <Topbar />
       <Nav current={page} nav={nav} />
-      {pages[page] || <PageHome nav={nav} />}
+      <main id="main-content">
+        {pages[page] || <PageHome nav={nav} />}
+      </main>
       <Footer nav={nav} />
     </div>
   );
