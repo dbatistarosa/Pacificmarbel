@@ -248,7 +248,7 @@ function PageHome({ nav }) {
               Boca Raton, Florida · Est. 2003
             </div>
             <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2.8rem,5.5vw,4.8rem)", fontWeight: 300, color: C.white, lineHeight: 1.08, marginBottom: "1.4rem" }}>
-              We Treat Every<br /><em style={{ fontStyle: "italic", color: C.gl }}>Home as a Yacht.</em>
+              Marble Restoration<br /><em style={{ fontStyle: "italic", color: C.gl }}>Boca Raton, FL</em>
             </h1>
             <p style={{ fontSize: 15, color: "rgba(255,255,255,.62)", lineHeight: 1.82, maxWidth: 500, marginBottom: "2.4rem", fontWeight: 300 }}>
               South Florida's most recommended marble restoration company. Expert polishing, grout services, porcelain cleaning, and yacht stone care — serving Palm Beach, Broward & Dade since 2003.
@@ -1146,7 +1146,6 @@ export default function App() {
   return (
     <div style={{ fontFamily: "'Outfit', sans-serif", background: C.mw, minHeight: "100vh" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
         *{box-sizing:border-box;margin:0;padding:0;}
         h1,h2,h3{margin:0;}p{margin:0;}
         @media(max-width:900px){

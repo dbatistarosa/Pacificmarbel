@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /dist/server/
 
 Sitemap: https://pacificmarbel.vercel.app/sitemap.xml
